@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-[#f7faf7]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#166534">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>SproutS Dashboard - ระบบวิเคราะห์และวางแผนการทบทวนความรู้</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for smooth mathematical graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.460.0"></script>
+    <!-- Google Fonts: Kanit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind config (ต้องมาหลัง Tailwind CDN) -->
+    <script src="js/config.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="h-full flex flex-col antialiased bg-[#f7faf7]">
+
+    <div id="app" class="flex app-h overflow-hidden">
+
+        <!-- Backdrop ของเมนูบนมือถือ (กดนอกเมนูเพื่อปิด) -->
+        <div id="sidebarBackdrop" class="fixed inset-0 bg-slate-900/40 z-[25] hidden md:hidden"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="bg-white border-r border-slate-200 w-64 flex-shrink-0 flex flex-col justify-between transition-all duration-300 z-30 fixed md:relative inset-y-0 left-0 -translate-x-full md:translate-x-0">
+            <div>
+                <!-- Sidebar Header -->
+                <div class="h-16 flex items-center justify-between px-4 border-b border-slate-100">
+                    <div class="flex items-center space-x-3 sidebar-text">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-700 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                            S
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-slate-800 text-base leading-tight">SproutS</span>
+                            <span class="text-[10px] text-emerald-700 font-semibold tracking-wide">by Sarayut Angkoh</span>
+                        </div>
+                    </div>
+                    <button id="toggleSidebar" class="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i data-lucide="panel-left-close" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <nav class="p-3 space-y-1">
+                    <a href="#home" onclick="switchTab('home')" id="nav-home" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-emerald-800 bg-emerald-50 font-medium transition-all">
+                        <i data-lucide="home" class="w-5 h-5 text-emerald-700"></i>
+                        <span class="sidebar-text">หน้าแรก (โหมดอย่างง่าย)</span>
+                    </a>
+                    <a href="#dashboard" onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium transition-all">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 text-slate-500"></i>
+                        <span class="sidebar-text">ภาพรวมเชิงลึก</span>
+                    </a>
+                    <a href="#subjects" onclick="switchTab('subjects')" id="nav-subjects" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium transition-all">
+                        <i data-lucide="book-open" class="w-5 h-5 text-slate-500"></i>
+                        <span class="sidebar-text">จัดการรายวิชา</span>
+                    </a>
+                    <a href="#forecast" onclick="switchTab('forecast')" id="nav-forecast" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium transition-all">
+                        <i data-lucide="line-chart" class="w-5 h-5 text-slate-500"></i>
+                        <span class="sidebar-text">ตารางคาดการณ์</span>
+                    </a>
+                    <a href="#formula" onclick="switchTab('formula')" id="nav-formula" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium transition-all">
+                        <i data-lucide="file-text" class="w-5 h-5 text-slate-500"></i>
+                        <span class="sidebar-text">คู่มือตัวแปรและสูตร</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Sidebar Footer Status -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50/50 sidebar-text">
+                <div class="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                    <span>สถานะ</span>
+                    <span class="inline-flex items-center text-emerald-700 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 pulse-green"></span>
+                        อัปเดตอัตโนมัติ
+                    </span>
+                </div>
+                <div class="text-[11px] text-slate-400">
+                    SproutS v2.7
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 min-w-0 flex flex-col app-h overflow-hidden">
+            <header class="min-h-[3.5rem] sm:h-16 bg-white border-b border-slate-200 px-3 sm:px-6 py-2 flex items-center justify-between gap-2 z-20">
+                <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+                    <button id="mobileSidebarToggle" aria-label="เปิดเมนู" class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg flex-shrink-0">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    <h1 id="pageTitle" class="text-sm sm:text-lg font-bold text-slate-800 truncate">หน้าแรก - สรุปแผนการทบทวนอย่างง่าย</h1>
+
+                    <div class="hidden sm:flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3 py-1 rounded-full font-medium flex-shrink-0">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <span>คำนวณใหม่ใน <span id="countdownTimer">30</span>s</span>
+                    </div>
+
+                    <div class="hidden lg:flex items-center space-x-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs px-3 py-1 rounded-full font-semibold flex-shrink-0">
+                        <i data-lucide="sprout" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <span>SproutS by Sarayut Angkoh</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                    <!-- Quick Navigator to Review Section -->
+                    <button onclick="navigateToQuickLog()" aria-label="บันทึกการทบทวน" class="bg-amber-500 hover:bg-amber-600 text-white text-xs sm:text-sm font-medium p-2.5 sm:px-3.5 sm:py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-sm">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">บันทึกการทบทวน</span>
+                    </button>
+
+                    <button onclick="openModal('addSubjectModal')" aria-label="เพิ่มวิชาใหม่" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-medium p-2.5 sm:px-3.5 sm:py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">เพิ่มวิชาใหม่</span>
+                    </button>
+
+                    <div id="authContainer">
+                        <button onclick="openModal('authModal')" aria-label="เข้าสู่ระบบ" class="border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-medium p-2.5 sm:px-3.5 sm:py-2 rounded-lg flex items-center gap-1.5 transition-colors">
+                            <i data-lucide="user" class="w-4 h-4 text-slate-500"></i>
+                            <span id="authButtonText" class="hidden sm:inline">เข้าสู่ระบบ / สมัครสมาชิก</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] space-y-4 sm:space-y-6">
+
+                <!-- TAB 0: SIMPLE HOME TAB (โหมดอย่างง่าย) -->
+                <div id="tab-home" class="space-y-6">
+                    
+                    <!-- Welcome & Quick Focus Hero Banner -->
+                    <div class="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 text-white p-4 sm:p-6 rounded-2xl shadow-sm border border-emerald-700 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+                        <div class="space-y-2 max-w-xl z-10">
+                            <div class="inline-flex items-center space-x-2 bg-emerald-700/60 border border-emerald-500/60 px-3 py-1 rounded-full text-xs font-semibold text-emerald-200">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-300"></i>
+                                <span>โหมดอย่างง่าย</span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">วางแผนทบทวนความรู้กับ SproutS</h2>
+                            <p class="text-xs text-emerald-100 leading-relaxed">
+                                ระบบช่วยบอกว่าควรทบทวนเมื่อไหร่ เพื่อให้ <strong>ค่า S (ความแข็งแรงความจำ)</strong> สูงขึ้น ยิ่ง S สูง คุณจะจำได้นานขึ้นและ <strong>ลืมช้าลง!</strong>
+                            </p>
+                        </div>
+
+                        <!-- Next Subject Focus Box -->
+                        <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl space-y-2 text-white w-full md:w-auto md:min-w-[280px] z-10">
+                            <div class="flex items-center justify-between text-xs text-emerald-200 font-semibold">
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-amber-300 animate-bounce"></i>
+                                    วิชาที่ควรทบทวนต่อไป
+                                </span>
+                                <span class="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-mono">จุด R=0.85</span>
+                            </div>
+
+                            <div id="simpleHomeNextSubName" class="text-lg font-bold text-amber-300 truncate py-1">
+                                กำลังคำนวณ...
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs pt-1 border-t border-white/10">
+                                <span class="text-slate-300">ระยะเวลาทบทวน:</span>
+                                <span id="simpleHomeNextSubTime" class="font-mono font-bold text-emerald-300 text-sm">--:--</span>
+                            </div>
+
+                            <!-- Quick Navigator Button -->
+                            <button onclick="navigateToQuickLog()" class="w-full mt-2 py-2 bg-amber-400 hover:bg-amber-300 text-amber-950 font-bold text-xs rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow-sm cursor-pointer">
+                                <i data-lucide="arrow-down-circle" class="w-4 h-4"></i>
+                                <span>ไปที่ส่วนบันทึกการทบทวน</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Simple Stats Grid (สถิติง่ายๆ 3 ตัว) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">วิชาทั้งหมดในระบบ</p>
+                                <h3 id="simpleStatTotal" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                                <p class="text-[11px] text-slate-400 mt-1">รายวิชาที่กำลังติดตาม</p>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700">
+                                <i data-lucide="book-open" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-xl border border-amber-200 bg-amber-50/20 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-600">วิชาที่ถึงเวลาทบทวน</p>
+                                <h3 id="simpleStatUrgent" class="text-2xl font-bold text-amber-600 mt-1">0</h3>
+                                <p class="text-[11px] text-amber-700 font-medium mt-1">ความจำเหลือน้อยกว่า 85% แล้ว</p>
+                            </div>
+                            <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600">
+                                <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">ความแข็งแรงความจำเฉลี่ย (ค่า S)</p>
+                                <h3 id="simpleStatAvgS" class="text-2xl font-bold text-emerald-700 mt-1">0 ชม.</h3>
+                                <p class="text-[11px] text-emerald-700 font-medium mt-1">ยิ่งสูง = ยิ่งลืมช้า</p>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700">
+                                <i data-lucide="shield-check" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Guidance & Advice Card -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+                            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                                <i data-lucide="lightbulb" class="w-5 h-5 text-amber-500"></i>
+                                <span>คำแนะนำง่ายๆ สำหรับการทบทวน</span>
+                            </h3>
+
+                            <!-- PROMINENT JUMP BUTTON (ข้อ 2: ทำให้เด่นชัดมากๆ ในหน้าหลัก) -->
+                            <button onclick="switchTab('formula')" class="glow-jump-btn w-full sm:w-auto bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-amber-950 font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-lg cursor-pointer transition-all border-2 border-amber-300">
+                                <i data-lucide="book-open-check" class="w-5 h-5 text-amber-950 animate-bounce"></i>
+                                <span class="tracking-wide uppercase">อ่านคู่มือ: ตัวแปรและวิธีคำนวณ</span>
+                                <i data-lucide="arrow-right-circle" class="w-5 h-5 text-amber-950"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-600">
+                            <div class="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 space-y-1">
+                                <div class="font-bold text-emerald-900 flex items-center gap-1.5">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[10px]">1</span>
+                                    <span>ความหมายของค่า S</span>
+                                </div>
+                                <p class="text-slate-600 text-[11px] leading-relaxed">
+                                    <strong>ยิ่งค่า S สูง ยิ่งลืมช้า</strong> เมื่อ S เพิ่มขึ้น ความจำจะอยู่ได้นานขึ้น ทำให้รอบทบทวนครั้งถัดไปห่างออกไป
+                                </p>
+                            </div>
+
+                            <div class="p-3 bg-amber-50/60 rounded-xl border border-amber-100 space-y-1">
+                                <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                                    <span class="w-5 h-5 rounded-full bg-amber-600 text-white flex items-center justify-center text-[10px]">2</span>
+                                    <span>ทบทวนในจุด R = 85%</span>
+                                </div>
+                                <p class="text-slate-600 text-[11px] leading-relaxed">
+                                    เมื่อระบบแจ้งว่าความจำเหลือ 85% ให้ทบทวนได้เลย เพราะเป็นช่วงที่เริ่มนึกยากขึ้นเล็กน้อย การทบทวนตอนนี้ช่วยเพิ่มค่า S ได้ดี
+                                </p>
+                            </div>
+
+                            <div class="p-3 bg-teal-50/60 rounded-xl border border-teal-100 space-y-1">
+                                <div class="font-bold text-teal-900 flex items-center gap-1.5">
+                                    <span class="w-5 h-5 rounded-full bg-teal-700 text-white flex items-center justify-center text-[10px]">3</span>
+                                    <span>ประเมินระดับความจำ</span>
+                                </div>
+                                <p class="text-slate-600 text-[11px] leading-relaxed">
+                                    <strong>พยายามนึกคำตอบเองก่อนดูเฉลย</strong> (ได้ผลกว่าการอ่านซ้ำ) แล้วเลือก 1 ใน 4 ระดับ (ซ้ำอีกครั้ง, ยาก, ปานกลาง, ง่าย) แล้วกดยืนยัน จากนั้นตอบสั้นๆ ว่าทบทวนด้วยการอ่านหรือทำข้อสอบ ระบบจะปรับค่า S ให้ตามความจำจริงของคุณ
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Home: review log calendar -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2"><i data-lucide="calendar-check" class="w-5 h-5 text-emerald-700"></i><span>ปฏิทินบันทึกการทบทวน</span></h3>
+                                <p class="text-xs text-slate-500">ทุกครั้งที่กด "ยืนยันการบันทึก" จะเกิด 1 ขีดในวันนี้ (บันทึกได้เฉพาะวันที่เป็นจริงเท่านั้น) กดที่วันเพื่อดูรายการ</p>
+                            </div>
+                            <div id="liveClock" class="text-xs font-mono bg-slate-100 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg"></div>
+                        </div>
+                        <div id="reviewCalendar"></div>
+                    </div>
+
+                    <!-- Home: goals + forecast -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-amber-600"></i><span>เป้าหมายและแผนทบทวน</span></h3>
+                                <p class="text-xs text-slate-500">ตั้งวันสอบหรือวันที่อยากจำได้ ระบบจะบอกว่าต้องทบทวนกี่ครั้ง วันไหน</p>
+                            </div>
+                            <button onclick="openGoalModal()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium px-3.5 py-2 rounded-lg flex items-center justify-center space-x-1.5 shadow-sm"><i data-lucide="plus" class="w-4 h-4"></i><span>ตั้งเป้าหมาย</span></button>
+                        </div>
+                        <div id="homeGoalsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2"><i data-lucide="grid" class="w-5 h-5 text-teal-700"></i><span>คาดการณ์ความจำในอนาคต</span></h3>
+                            <div class="flex items-center gap-3">
+                                <button onclick="navigateToQuickLog()" class="glow-jump-btn bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm cursor-pointer">
+                                    <i data-lucide="zap" class="w-4 h-4"></i><span>ทบทวนเลยตอนนี้</span>
+                                </button>
+                                <button onclick="switchTab('forecast')" class="text-xs text-emerald-700 hover:text-emerald-800 font-bold">ดูแบบเต็ม</button>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-500">สีเขียว = จำได้แม่น, เหลือง = ควรทบทวน, ส้ม = เริ่มลืม, แดง = ลืมมาก (ถ้าไม่ทบทวนเพิ่ม)</p>
+                        <div id="homeHeatmapContainer" class="overflow-x-auto"></div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 1: DASHBOARD MAIN (ภาพรวมวิเคราะห์เชิงลึก) -->
+                <div id="tab-dashboard" class="hidden space-y-6">
+                    
+                    <!-- Metrics Summary Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">วิชาทั้งหมดที่ติดตาม</p>
+                                <h3 id="statTotalSubjects" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                                <p class="text-[11px] text-slate-400 mt-1">อยู่ในระบบ</p>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700">
+                                <i data-lucide="book" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-xl border border-rose-200/80 bg-rose-50/20 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-600">วิชาที่ลืมเกินครึ่ง (&lt;50%)</p>
+                                <h3 id="statCriticalSubjects" class="text-2xl font-bold text-rose-600 mt-1">0</h3>
+                                <p class="text-[11px] font-medium text-rose-600 mt-1">ควรเรียนซ้ำ</p>
+                            </div>
+                            <div class="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center text-rose-600">
+                                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-teal-50 to-emerald-50 p-4 rounded-xl border-2 border-teal-500/80 shadow-md flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute -right-2 -bottom-2 w-16 h-16 bg-teal-200/30 rounded-full blur-sm"></div>
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <p class="text-xs font-bold text-teal-800 flex items-center gap-1">
+                                        <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-teal-600 animate-bounce"></i>
+                                        วิชาถัดไปที่ควรทบทวน
+                                    </p>
+                                    <span id="statNextReviewBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-700 text-white shadow-sm">จุด R=0.85</span>
+                                </div>
+                                <div id="statNextReviewSub" class="text-base font-extrabold text-slate-900 tracking-wide line-clamp-1 my-1 px-2 py-1 bg-white/80 backdrop-blur rounded-lg border border-teal-200 text-teal-900 shadow-sm">
+                                    กำลังโหลด...
+                                </div>
+                                <div class="flex items-center justify-between text-xs mt-1">
+                                    <span class="text-slate-500">เวลาทบทวน:</span>
+                                    <span id="statNextReviewTime" class="font-mono font-bold text-teal-700 text-sm">--:--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">ความแข็งแรงความจำเฉลี่ย (ค่า S)</p>
+                                <h3 id="statAvgStrength" class="text-2xl font-bold text-slate-800 mt-1">0 ชม.</h3>
+                                <p class="text-[11px] text-emerald-700 mt-1">ยิ่งค่า S มาก ยิ่งลืมช้า</p>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700">
+                                <i data-lucide="zap" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Guide Banner -->
+                    <div class="bg-gradient-to-r from-slate-900 to-emerald-950 text-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-sm sm:text-base flex items-center gap-2 text-emerald-400">
+                                <i data-lucide="help-circle" class="w-5 h-5"></i>
+                                <span>คู่มือใช้งาน: ค่า R และ ค่า S คืออะไร</span>
+                            </h3>
+                            <button onclick="navigateToQuickLog()" class="text-[11px] bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1 rounded-full font-bold flex items-center gap-1 cursor-pointer">
+                                <span>ไปที่ส่วนบันทึก</span>
+                                <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700 space-y-1.5">
+                                <p class="font-bold text-emerald-300 flex items-center gap-1.5">
+                                    <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-400"></i>
+                                    ค่า R และ ค่า S
+                                </p>
+                                <p class="text-slate-300 leading-relaxed text-[11px]">
+                                    • <strong>ค่า R (0% - 100%):</strong> ตอนนี้คุณจำเรื่องนั้นได้กี่ % ยิ่งสูงยิ่งจำได้ดี<br>
+                                    • <strong>ค่า S (หน่วยชั่วโมง):</strong> ความแข็งแรงของความจำ <strong>ยิ่ง S สูง ยิ่งลืมช้า</strong> และทบทวนห่างขึ้นได้
+                                </p>
+                            </div>
+
+                            <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700 space-y-1.5">
+                                <p class="font-bold text-amber-300 flex items-center gap-1.5">
+                                    <i data-lucide="sliders" class="w-4 h-4 text-amber-400"></i>
+                                    ปุ่มประเมินปรับค่า S อย่างไร
+                                </p>
+                                <p class="text-slate-300 leading-relaxed text-[11px]">
+                                    เมื่อกดยืนยัน ระบบจะนำ S เดิมมาคูณตัวเลขตามระดับที่เลือก ยิ่งเลือกระดับง่าย <strong>ตัวคูณยิ่งสูง ค่า S จึงเพิ่มมาก</strong> และรอบทบทวนถัดไปห่างขึ้น<br>จากนั้นระบบจะถามต่อว่า <strong>ทบทวนด้วยวิธีไหน</strong> (อ่าน/ทำข้อสอบ) เพราะทำข้อสอบช่วยให้จำได้นานกว่าอ่านอย่างเดียว
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 4 Buttons Explicit Guide -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
+                            <div class="p-2.5 bg-rose-950/60 border border-rose-800/60 rounded-xl space-y-1">
+                                <div class="font-bold text-rose-300 flex items-center justify-between">
+                                    <span>1. ซ้ำอีกครั้ง (Again)</span>
+                                    <span class="font-mono bg-rose-900/80 text-rose-200 px-1.5 py-0.5 rounded text-[10px]">รีเซ็ต</span>
+                                </div>
+                                <p class="text-rose-200/80 text-[10px] leading-tight"><strong>หมายถึง:</strong> จำไม่ได้ หรือตอบผิด → รีเซ็ต S เหลือ 1 ชม. เพื่อให้ทบทวนใหม่ในไม่กี่นาที</p>
+                            </div>
+
+                            <div class="p-2.5 bg-amber-950/60 border border-amber-800/60 rounded-xl space-y-1">
+                                <div class="font-bold text-amber-300 flex items-center justify-between">
+                                    <span>2. ยาก (Hard)</span>
+                                    <span class="font-mono bg-amber-900/80 text-amber-200 px-1.5 py-0.5 rounded text-[10px]">คูณ 1.2x</span>
+                                </div>
+                                <p class="text-amber-200/80 text-[10px] leading-tight"><strong>หมายถึง:</strong> จำได้ แต่ต้องคิดนาน → เพิ่ม S เล็กน้อย (1.2 เท่า)</p>
+                            </div>
+
+                            <div class="p-2.5 bg-blue-950/60 border border-blue-800/60 rounded-xl space-y-1">
+                                <div class="font-bold text-blue-300 flex items-center justify-between">
+                                    <span>3. ปานกลาง (Good)</span>
+                                    <span class="font-mono bg-blue-900/80 text-blue-200 px-1.5 py-0.5 rounded text-[10px]">คูณ 2.5x</span>
+                                </div>
+                                <p class="text-blue-200/80 text-[10px] leading-tight"><strong>หมายถึง:</strong> จำได้ดี นึกออกตามปกติ → เพิ่ม S เป็น 2.5 เท่า</p>
+                            </div>
+
+                            <div class="p-2.5 bg-emerald-950/60 border border-emerald-800/60 rounded-xl space-y-1">
+                                <div class="font-bold text-emerald-300 flex items-center justify-between">
+                                    <span>4. ง่าย (Easy)</span>
+                                    <span class="font-mono bg-emerald-900/80 text-emerald-200 px-1.5 py-0.5 rounded text-[10px]">คูณ 3.25x</span>
+                                </div>
+                                <p class="text-emerald-200/80 text-[10px] leading-tight"><strong>หมายถึง:</strong> จำได้แม่น ตอบได้ทันที → เพิ่ม S เป็น 3.25 เท่า</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <h2 class="text-base font-bold text-slate-800">กราฟความจำที่ค่อยๆ ลดลง (เส้นโค้งการลืม)</h2>
+                                    <span class="px-2 py-0.5 text-[10px] font-semibold bg-emerald-100 text-emerald-800 rounded">สูตร: R = e^(-t / S)</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-0.5">แสดงว่าความจำ (R) จะเหลือกี่ % เมื่อเวลาผ่านไป</p>
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs font-medium text-slate-600">ช่วงเวลาที่ดู:</span>
+                                <select id="timeRangeSelect" onchange="updateChart()" class="text-xs bg-slate-50 border border-slate-300 font-medium rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                                    <option value="24">24 ชั่วโมงข้างหน้า (1 วัน)</option>
+                                    <option value="72" selected>72 ชั่วโมงข้างหน้า (3 วัน)</option>
+                                    <option value="168">7 วันข้างหน้า (1 สัปดาห์)</option>
+                                    <option value="720">30 วันข้างหน้า (1 เดือน)</option>
+                                    <option value="8760">365 วันข้างหน้า (1 ปี)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Chart Canvas Container -->
+                        <div class="relative w-full h-[260px] sm:h-[320px]">
+                            <canvas id="retentionChart"></canvas>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between text-xs text-slate-500 pt-2 bg-slate-50/70 p-3 rounded-lg border border-slate-100 gap-2">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <span class="flex items-center space-x-1.5">
+                                    <span class="w-3 h-0.5 bg-teal-500 border-t border-dashed border-teal-500 inline-block"></span>
+                                    <span class="font-semibold text-teal-700">จุดแนะนำให้ทบทวน R=0.85 (85%)</span>
+                                </span>
+                                <span class="flex items-center space-x-1.5">
+                                    <span class="w-3 h-0.5 bg-amber-500 border-t border-dashed border-amber-500 inline-block"></span>
+                                    <span>ควรทบทวน R=0.75 (75%)</span>
+                                </span>
+                                <span class="flex items-center space-x-1.5">
+                                    <span class="w-3 h-0.5 bg-rose-500 border-t border-dashed border-rose-500 inline-block"></span>
+                                    <span class="text-rose-600 font-medium">ลืมเกินครึ่ง R&lt;0.50 (50%)</span>
+                                </span>
+                            </div>
+                            <span class="text-[11px] text-slate-400">คำนวณจากเวลาปัจจุบัน</span>
+                        </div>
+                    </div>
+
+                    <!-- Active Subjects Cards Grid Target Section -->
+                    <div id="logCardSection" class="space-y-4 pt-2 scroll-mt-20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                    <i data-lucide="check-square" class="w-5 h-5 text-emerald-700"></i>
+                                    <span>บันทึกการทบทวน</span>
+                                </h2>
+                                <p class="text-xs text-slate-500">ประเมินระดับความจำและกดปุ่มยืนยันเพื่อขยายค่า S (ยิ่งค่า S สูง ยิ่งลืมช้า)</p>
+                            </div>
+                            <button onclick="openModal('addSubjectModal')" class="text-xs text-emerald-700 hover:text-emerald-800 font-medium flex items-center space-x-1">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                                <span>เพิ่มรายวิชาใหม่</span>
+                            </button>
+                        </div>
+
+                        <div id="subjectCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Dynamic insertion via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: SUBJECTS MANAGEMENT -->
+                <div id="tab-subjects" class="hidden space-y-6">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <div>
+                                <h2 class="text-base font-bold text-slate-800">การจัดการรายวิชาทั้งหมด</h2>
+                                <p class="text-xs text-slate-500">ดู ลบ หรือเพิ่มรายวิชาในระบบ</p>
+                            </div>
+                            <button onclick="openModal('addSubjectModal')" class="bg-emerald-700 text-white text-xs font-medium px-3 py-2 rounded-lg flex items-center space-x-1.5 hover:bg-emerald-800">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span>เพิ่มวิชาใหม่</span>
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[640px] text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-3">ชื่อรายวิชา</th>
+                                        <th class="p-3">หมวดหมู่</th>
+                                        <th class="p-3">ความแข็งแรงความจำ (ค่า S)</th>
+                                        <th class="p-3">ทบทวนล่าสุด</th>
+                                        <th class="p-3">ความจำตอนนี้</th>
+                                        <th class="p-3 text-right">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subjectsTableBody" class="divide-y divide-slate-100">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: REVIEW FORECAST -->
+                <div id="tab-forecast" class="hidden space-y-6">
+                    
+                    <!-- Goal Planner -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="pb-3 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div>
+                                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                    <i data-lucide="target" class="w-5 h-5 text-amber-600"></i>
+                                    <span>แผนทบทวนตามเป้าหมาย</span>
+                                </h2>
+                                <p class="text-xs text-slate-500 mt-0.5">ตั้งวันที่อยากให้ยังจำได้ (เช่น วันสอบ) ระบบจะวางแผนว่าควรทบทวนกี่ครั้ง วันไหนบ้าง และไม่ควรเกินวันที่เท่าไร</p>
+                            </div>
+                            <button onclick="openGoalModal()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium px-3.5 py-2 rounded-lg flex items-center space-x-1.5 shadow-sm">
+                                <i data-lucide="target" class="w-4 h-4"></i><span>ตั้ง / แก้เป้าหมาย</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3 text-xs">
+                            <label class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-1.5">วิชา:
+                                <select id="plannerSubject" onchange="plannerSubjectId=this.value;renderPlanner()" class="bg-slate-50 border border-slate-300 rounded-lg px-2 py-2 sm:py-1.5"></select>
+                            </label>
+                            <label class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-1.5">สมมติว่าทบทวนแต่ละครั้งรู้สึก:
+                                <select id="plannerGrade" onchange="plannerGrade=this.value;updateAllViews()" class="bg-slate-50 border border-slate-300 rounded-lg px-2 py-2 sm:py-1.5">
+                                    <option value="hard">ยาก (× 1.2)</option><option value="good">ปานกลาง (× 2.5)</option><option value="easy">ง่าย (× 3.25)</option>
+                                </select>
+                            </label>
+                            <label class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-1.5">และทบทวนด้วยวิธี:
+                                <select id="plannerMethod" onchange="plannerMethod=this.value;updateAllViews()" class="bg-slate-50 border border-slate-300 rounded-lg px-2 py-2 sm:py-1.5">
+                                    <option value="read">อ่าน/จำอย่างเดียว (× 0.65)</option><option value="read_test">อ่านแล้วทำข้อสอบต่อ (× 0.85)</option><option value="test">ทำข้อสอบ/ทดสอบตัวเอง (× 1.0)</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div id="plannerBody" class="space-y-4"></div>
+                    </div>
+
+                    <!-- Future Memory Projection Heatmap Matrix -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="pb-3 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div>
+                                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                    <i data-lucide="grid" class="w-5 h-5 text-teal-700"></i>
+                                    <span>ตารางสีคาดการณ์ความจำในอนาคต</span>
+                                </h2>
+                                <p class="text-xs text-slate-500 mt-0.5">ดูล่วงหน้าว่าความจำแต่ละวิชาจะเหลือกี่ % ถ้าไม่ได้ทบทวนเพิ่ม</p>
+                            </div>
+
+                            <!-- Heatmap Legend -->
+                            <div class="flex flex-wrap items-center gap-2 text-[11px]">
+                                <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-medium">
+                                    <span class="w-2.5 h-2.5 bg-emerald-500 rounded-sm"></span> 90% ขึ้นไป สดใหม่
+                                </span>
+                                <span class="inline-flex items-center gap-1 bg-teal-100 text-teal-800 px-2 py-0.5 rounded font-medium">
+                                    <span class="w-2.5 h-2.5 bg-teal-500 rounded-sm"></span> 85-89% ควรทบทวน
+                                </span>
+                                <span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-medium">
+                                    <span class="w-2.5 h-2.5 bg-amber-400 rounded-sm"></span> 75-84% เริ่มคลาย
+                                </span>
+                                <span class="inline-flex items-center gap-1 bg-orange-100 text-orange-800 px-2 py-0.5 rounded font-medium">
+                                    <span class="w-2.5 h-2.5 bg-orange-500 rounded-sm"></span> 50-74% เริ่มลืม
+                                </span>
+                                <span class="inline-flex items-center gap-1 bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-medium">
+                                    <span class="w-2.5 h-2.5 bg-rose-500 rounded-sm"></span> ต่ำกว่า 50% ลืมมาก
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Combined Color Blocks Matrix Container -->
+                        <div id="memoryHeatmapContainer" class="overflow-x-auto">
+                            <!-- Dynamic insertion via JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Review Priority Queue -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="pb-3 border-b border-slate-100">
+                            <h2 class="text-base font-bold text-slate-800">ลำดับวิชาที่ควรทบทวนก่อน</h2>
+                            <p class="text-xs text-slate-500">เรียงจากวิชาที่ความจำเหลือน้อยที่สุดขึ้นก่อน</p>
+                        </div>
+
+                        <div class="space-y-3" id="forecastListContainer">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: คำอธิบายระบบ (ภาษาง่าย ไม่ใช้สัญลักษณ์สูตรพิเศษ) -->
+                <div id="tab-formula" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+
+                        <div class="bg-gradient-to-r from-emerald-900 to-teal-800 text-white p-6 rounded-xl shadow-sm space-y-2">
+                            <div class="flex items-center space-x-2 text-xs font-semibold text-emerald-300 uppercase tracking-widest">
+                                <i data-lucide="sprout" class="w-4 h-4"></i>
+                                <span>SproutS</span>
+                            </div>
+                            <h2 class="text-2xl font-bold">คู่มือ: ระบบนี้คำนวณอะไร และใช้ตัวแปรอะไรบ้าง</h2>
+                            <p class="text-xs text-emerald-100 leading-relaxed max-w-3xl">
+                                อธิบายแบบเข้าใจง่ายว่าแต่ละตัวเลขในแอปมาจากไหน และระบบวางแผนเวลาทบทวนให้คุณอย่างไร (ออกแบบโดย <strong>Sarayut Angkoh</strong>)
+                            </p>
+                        </div>
+
+                        <div class="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-r-2xl border border-amber-200/80 space-y-2">
+                            <div class="flex items-center space-x-2 text-amber-900 font-bold text-sm sm:text-base">
+                                <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 flex-shrink-0"></i>
+                                <span>โปรดทราบก่อนใช้งาน</span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-amber-900 leading-relaxed">
+                                แอปนี้เป็นเพียง<strong>เครื่องมือประมาณการ</strong>ช่วงเวลาทบทวนคร่าวๆ ผลที่ได้อาจไม่ตรงกับความจำจริงของคุณ 100% เพราะความจำขึ้นอยู่กับหลายอย่าง เช่น ความเครียด การนอน ความยากของเนื้อหา และวิธีเรียนของแต่ละคน
+                                <br><br>
+                                สูตร R = e^(-t / S) เป็น<strong>แบบจำลองอย่างง่าย</strong> ส่วนตัวคูณทั้ง 4 ระดับและจุด 85% เป็น<strong>ค่าที่ผู้พัฒนาเลือกตั้งไว้</strong> (85% อยู่ในช่วง 75-90% ที่ระบบทบทวนแบบเว้นระยะอย่าง FSRS นิยมใช้) ไม่ใช่ค่าที่งานวิจัยพิสูจน์ว่าดีที่สุดสำหรับทุกคน ใช้เป็นแนวทางประกอบการวางแผนเท่านั้น
+                            </p>
+                        </div>
+
+                        <!-- 1. ตัวแปร -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2 border-b border-slate-200 pb-2">
+                                <i data-lucide="calculator" class="w-5 h-5 text-emerald-700"></i>
+                                <span>1. ตัวแปรที่ใช้ในระบบ</span>
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                                <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-200 space-y-2">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <h4 class="font-bold text-emerald-900 text-sm">R = ความจำที่เหลืออยู่</h4>
+                                        <span class="font-mono bg-emerald-200 text-emerald-900 text-[11px] px-2 py-0.5 rounded font-bold">0 ถึง 1 (0% - 100%)</span>
+                                    </div>
+                                    <p class="text-slate-700 leading-relaxed">
+                                        บอกว่าตอนนี้คุณยังจำเรื่องนั้นได้กี่เปอร์เซ็นต์<br>
+                                        • R = 1.0 (100%): จำได้ครบ สดใหม่<br>
+                                        • R = 0.85 (85%): จุดที่แอปแนะนำให้ทบทวน<br>
+                                        • R ต่ำกว่า 0.50 (50%): ลืมไปเกินครึ่ง ควรเรียนใหม่
+                                    </p>
+                                </div>
+
+                                <div class="bg-teal-50/50 p-4 rounded-xl border border-teal-200 space-y-2">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <h4 class="font-bold text-teal-900 text-sm">S = ความแข็งแรงของความจำ</h4>
+                                        <span class="font-mono bg-teal-200 text-teal-900 text-[11px] px-2 py-0.5 rounded font-bold">หน่วย: ชั่วโมง</span>
+                                    </div>
+                                    <p class="text-slate-700 leading-relaxed">
+                                        <strong>ยิ่ง S สูง ยิ่งลืมช้า</strong> ทำให้เว้นระยะทบทวนได้นานขึ้น<br>
+                                        • S คือจำนวนชั่วโมงที่ความจำจะเหลือประมาณ 36.8% ถ้าไม่ทบทวนเลย (เพราะ e<sup>-1</sup> = 0.368)<br>
+                                        • ตัวอย่าง: S = 24 หมายถึงผ่านไป 24 ชั่วโมง ความจำจะเหลือประมาณ 37%
+                                    </p>
+                                </div>
+
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <h4 class="font-bold text-slate-800 text-sm">t = เวลาที่ผ่านไป</h4>
+                                        <span class="font-mono bg-slate-200 text-slate-800 text-[11px] px-2 py-0.5 rounded font-bold">หน่วย: ชั่วโมง</span>
+                                    </div>
+                                    <p class="text-slate-700 leading-relaxed">
+                                        นับจากครั้งล่าสุดที่คุณทบทวนหรือกดบันทึก<br>
+                                        t = เวลาตอนนี้ - เวลาที่ทบทวนล่าสุด<br>นับต่อเนื่องแม้ปิดเว็บไว้ เพราะคำนวณจากเวลาจริง ตอนเปิดแอปอีกครั้งระบบหักเวลาที่ผ่านไปให้เอง
+                                    </p>
+                                </div>
+
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <h4 class="font-bold text-slate-800 text-sm">e = ค่าคงที่ทางคณิตศาสตร์</h4>
+                                        <span class="font-mono bg-slate-200 text-slate-800 text-[11px] px-2 py-0.5 rounded font-bold">e ≈ 2.71828</span>
+                                    </div>
+                                    <p class="text-slate-700 leading-relaxed">
+                                        ตัวเลขคงที่ที่ใช้ในสมการที่ค่อยๆ ลดลง (ในเครื่องคิดเลขมักเป็นปุ่ม e^x)
+                                    </p>
+                                </div>
+
+                                <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-200 space-y-2 col-span-1 md:col-span-2">
+                                    <h4 class="font-bold text-emerald-900 text-sm">สูตรความจำที่เหลือ</h4>
+                                    <p class="font-mono text-sm bg-white border border-emerald-200 rounded-lg px-3 py-2 text-emerald-900 font-bold">R = e^(-t / S)</p>
+                                    <p class="text-slate-700 leading-relaxed">
+                                        อ่านว่า: ยิ่งเวลาผ่านไปนาน (t มาก) ความจำที่เหลือ (R) ยิ่งน้อย แต่ถ้าความแข็งแรง (S) สูง R จะลดช้าลง<br>
+                                        ตัวอย่าง: S = 24 ชม., t = 24 ชม. จะได้ R = e^(-1) = 0.368 หรือประมาณ 37%
+                                    </p>
+                                </div>
+
+                                <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200 space-y-2 col-span-1 md:col-span-2">
+                                    <h4 class="font-bold text-amber-900 text-sm">เวลาที่แนะนำให้ทบทวน (เมื่อ R เหลือ 85%)</h4>
+                                    <p class="font-mono text-sm bg-white border border-amber-200 rounded-lg px-3 py-2 text-amber-900 font-bold">เวลาทบทวน = -S × ln(0.85) ≈ 0.1625 × S</p>
+                                    <p class="text-slate-700 leading-relaxed">
+                                        คือเวลาที่ต้องรอจนความจำลดลงมาเหลือ 85% (ln คือปุ่ม ln ในเครื่องคิดเลข)<br>
+                                        ตัวอย่าง: S = 24 ชม. ควรทบทวนหลังผ่านไปประมาณ 0.1625 × 24 = 3.9 ชั่วโมง<br>
+                                        ที่เลือกจุด 85% เพราะเป็นช่วงที่ยังจำได้เป็นส่วนใหญ่ แต่เริ่มนึกยากขึ้นเล็กน้อย ซึ่งเป็นช่วงที่การทบทวนมักได้ผลดี (เป็นค่าที่แอปนี้เลือกใช้)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. ปุ่มประเมิน -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2 border-b border-slate-200 pb-2">
+                                <i data-lucide="sliders" class="w-5 h-5 text-emerald-700"></i>
+                                <span>2. ปุ่มประเมิน 4 ระดับ ปรับค่า S อย่างไร</span>
+                            </h3>
+
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                หลังทบทวนแล้วกดเลือกระดับ ระบบจะคำนวณ S ใหม่จากสูตร: <span class="font-mono font-bold">S ใหม่ = S เดิม × ตัวคูณตามระดับ × ตัวคูณตามวิธีทบทวน</span> และเริ่มนับเวลา t ใหม่จาก 0 ตัวคูณใช้ตามค่าเริ่มต้นของ Anki (ยาก 1.2 / ปานกลาง 2.5 / ง่าย 2.5 × 1.3 = 3.25)
+                            </p>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                                <div class="p-3.5 bg-rose-50 text-rose-900 rounded-xl border border-rose-200 space-y-1.5">
+                                    <div class="font-bold text-sm flex items-center justify-between border-b border-rose-200 pb-1">
+                                        <span>1. ซ้ำอีกครั้ง</span>
+                                        <span class="font-mono bg-rose-200 px-1.5 py-0.5 rounded text-[10px] font-bold">รีเซ็ต</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">
+                                        <strong>ใช้เมื่อ:</strong> นึกไม่ออก หรือตอบผิด<br>
+                                        <strong>สูตร:</strong> S ใหม่ = 1 ชม. (ค่า S ขั้นต่ำ)<br>
+                                        <strong>ผลลัพธ์:</strong> เริ่มนับใหม่ แอปจะเตือนให้ทบทวนซ้ำใน ~10 นาที (เทียบกับขั้นเรียนซ้ำเริ่มต้นของ Anki ที่ 10 นาที)
+                                    </p>
+                                </div>
+
+                                <div class="p-3.5 bg-amber-50 text-amber-900 rounded-xl border border-amber-200 space-y-1.5">
+                                    <div class="font-bold text-sm flex items-center justify-between border-b border-amber-200 pb-1">
+                                        <span>2. ยาก</span>
+                                        <span class="font-mono bg-amber-200 px-1.5 py-0.5 rounded text-[10px] font-bold">× 1.2</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">
+                                        <strong>ใช้เมื่อ:</strong> นึกออก แต่ต้องใช้เวลาคิดนานมาก<br>
+                                        <strong>สูตร:</strong> S ใหม่ = S เดิม × 1.2<br>
+                                        <strong>ผลลัพธ์:</strong> S เพิ่มขึ้น 20% เว้นระยะทบทวนห่างขึ้นเล็กน้อย
+                                    </p>
+                                </div>
+
+                                <div class="p-3.5 bg-blue-50 text-blue-900 rounded-xl border border-blue-200 space-y-1.5">
+                                    <div class="font-bold text-sm flex items-center justify-between border-b border-blue-200 pb-1">
+                                        <span>3. ปานกลาง</span>
+                                        <span class="font-mono bg-blue-200 px-1.5 py-0.5 rounded text-[10px] font-bold">× 2.5</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">
+                                        <strong>ใช้เมื่อ:</strong> นึกออกตามปกติ ลังเลเล็กน้อย<br>
+                                        <strong>สูตร:</strong> S ใหม่ = S เดิม × 2.5<br>
+                                        <strong>ผลลัพธ์:</strong> S เพิ่มเป็น 2.5 เท่า ลืมช้าลงชัดเจน
+                                    </p>
+                                </div>
+
+                                <div class="p-3.5 bg-emerald-50 text-emerald-900 rounded-xl border border-emerald-200 space-y-1.5">
+                                    <div class="font-bold text-sm flex items-center justify-between border-b border-emerald-200 pb-1">
+                                        <span>4. ง่าย</span>
+                                        <span class="font-mono bg-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-bold">× 3.25</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">
+                                        <strong>ใช้เมื่อ:</strong> ตอบได้ทันที ไม่ต้องคิด<br>
+                                        <strong>สูตร:</strong> S ใหม่ = S เดิม × 3.25<br>
+                                        <strong>ผลลัพธ์:</strong> S เพิ่มเป็น 3.25 เท่า เว้นระยะทบทวนได้นานมาก
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2.5 ตัวคูณตามวิธีทบทวน -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2 border-b border-slate-200 pb-2">
+                                <i data-lucide="brain" class="w-5 h-5 text-emerald-700"></i>
+                                <span>ตัวคูณตามวิธีทบทวน (อ่าน หรือ ทำข้อสอบ)</span>
+                            </h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                ก่อนบันทึก ระบบจะถามว่าคุณ<strong>ทำอะไรเป็นหลัก</strong> เพราะการอ่านอย่างเดียวมักลืมเร็วกว่าการลองนึกหรือทำข้อสอบเอง ตัวคูณจึงต่างกัน (ต้องเลือกจากตัวเลือกเท่านั้น เพื่อให้การคาดการณ์ไม่เพี้ยน)
+                            </p>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                                <div class="p-3.5 bg-slate-50 text-slate-800 rounded-xl border border-slate-200 space-y-1.5">
+                                    <div class="font-bold text-sm flex items-center justify-between border-b border-slate-200 pb-1"><span>อ่าน/จำอย่างเดียว</span><span class="font-mono bg-slate-200 px-1.5 py-0.5 rounded text-[10px] font-bold">× 0.65</span></div>
+                                    <p class="text-[11px] leading-relaxed">อ่านโน้ต ดูสไลด์ ท่องจำ โดยไม่ได้ทดสอบตัวเอง ค่า S เพิ่มน้อยที่สุด</p>
+                                </div>
+                                <div class="p-3.5 bg-teal-50 text-teal-900 rounded-xl border border-teal-200 space-y-1.5">
+                                    <div class="font-bold text-sm flex items-center justify-between border-b border-teal-200 pb-1"><span>อ่านแล้วทำข้อสอบต่อ</span><span class="font-mono bg-teal-200 px-1.5 py-0.5 rounded text-[10px] font-bold">× 0.85</span></div>
+                                    <p class="text-[11px] leading-relaxed">ตอบข้อแรก "อ่าน/จำ" แล้วตอบข้อสองว่า "ทำต่อ" ได้ทดสอบตัวเองบางส่วน</p>
+                                </div>
+                                <div class="p-3.5 bg-emerald-50 text-emerald-900 rounded-xl border border-emerald-200 space-y-1.5">
+                                    <div class="font-bold text-sm flex items-center justify-between border-b border-emerald-200 pb-1"><span>ทำข้อสอบ/ทดสอบตัวเอง</span><span class="font-mono bg-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-bold">× 1.00</span></div>
+                                    <p class="text-[11px] leading-relaxed">ลองนึก/ทำโจทย์ก่อนดูเฉลย ใช้ตัวคูณเต็ม (เป็นค่าอ้างอิง)</p>
+                                </div>
+                            </div>
+                            <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed space-y-2">
+                                <p class="font-bold text-sm">ที่มาของตัวเลข (ค่าประมาณ ไม่ใช่ผลทดลองโดยตรง)</p>
+                                <p>Roediger และ Karpicke (2006) พบว่าหลังผ่านไป 1 สัปดาห์ กลุ่มที่อ่านซ้ำจำได้ 40% กลุ่มที่อ่านแล้วทดสอบ 1 ครั้งจำได้ 56% และกลุ่มที่ทดสอบซ้ำจำได้ 61% เมื่อแปลงเป็นค่า S ตามสูตรของแอปนี้ จะต่างกันราว 1.6-1.9 เท่า (1 ÷ 1.85 ≈ 0.54)</p>
+                                <p>แต่งานรวมผลวิจัย (Rowland, 2014: g = 0.50 และ Adesope และคณะ, 2017: g = 0.61) แสดงว่าผลโดยเฉลี่ยเล็กกว่าการทดลองเดียว ผู้พัฒนาจึงปรับเข้าใกล้ 1 แบบระมัดระวังเป็น 0.65 / 0.85 / 1.00</p>
+                                <p>ตัวคูณรวมไม่ต่ำกว่า 1.00 (จำได้แล้ว ค่า S ไม่ควรลดลง) และปุ่ม "ซ้ำอีกครั้ง" ไม่ถามวิธีทบทวนเพราะรีเซ็ต S เสมอ</p>
+                            </div>
+                        </div>
+
+                        <!-- 3. ตารางสี -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2 border-b border-slate-200 pb-2">
+                                <i data-lucide="grid" class="w-5 h-5 text-emerald-700"></i>
+                                <span>3. ตารางสีคาดการณ์ความจำในอนาคต</span>
+                            </h3>
+
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-xs text-slate-700">
+                                <p class="leading-relaxed">
+                                    ระบบนำค่า S และเวลา t ของแต่ละวิชา มาคำนวณ R ล่วงหน้า 8 ช่วงเวลา (ตอนนี้, +12 ชม., +1 วัน, +3 วัน, +7 วัน, +30 วัน, +180 วัน, +365 วัน) แล้วแบ่งเป็นสีดังนี้ (สมมติว่าคุณไม่ได้ทบทวนเพิ่มในช่วงนั้น):
+                                </p>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 font-medium">
+                                    <div class="p-2.5 bg-emerald-100 text-emerald-900 rounded-lg border border-emerald-300">
+                                        <div class="font-bold">เขียวสด (90% ขึ้นไป)</div>
+                                        <p class="text-[11px] mt-0.5">จำแม่น ยังไม่ต้องทบทวน</p>
+                                    </div>
+                                    <div class="p-2.5 bg-teal-100 text-teal-900 rounded-lg border border-teal-300">
+                                        <div class="font-bold">เขียวอมฟ้า (85% - 89%)</div>
+                                        <p class="text-[11px] mt-0.5">ช่วงที่แนะนำให้ทบทวน</p>
+                                    </div>
+                                    <div class="p-2.5 bg-amber-100 text-amber-900 rounded-lg border border-amber-300">
+                                        <div class="font-bold">เหลือง (75% - 84%)</div>
+                                        <p class="text-[11px] mt-0.5">เริ่มคลาย ควรทบทวน</p>
+                                    </div>
+                                    <div class="p-2.5 bg-orange-100 text-orange-900 rounded-lg border border-orange-300">
+                                        <div class="font-bold">ส้ม (50% - 74%)</div>
+                                        <p class="text-[11px] mt-0.5">เริ่มลืม ต้องทบทวนด่วน</p>
+                                    </div>
+                                    <div class="p-2.5 bg-rose-100 text-rose-900 rounded-lg border border-rose-300">
+                                        <div class="font-bold">แดง (ต่ำกว่า 50%)</div>
+                                        <p class="text-[11px] mt-0.5">ลืมเกินครึ่ง ควรเรียนใหม่</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. แนวคิดและงานวิจัยที่เกี่ยวข้อง -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2 border-b border-slate-200 pb-2">
+                                <i data-lucide="book-marked" class="w-5 h-5 text-emerald-700"></i>
+                                <span>4. แนวคิดและงานวิจัยที่เกี่ยวข้อง</span>
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <h4 class="font-bold text-emerald-800 text-sm">เส้นโค้งการลืม (Ebbinghaus, 1885)</h4>
+                                    <p class="text-slate-600 leading-relaxed">Ebbinghaus ทดลองท่องพยางค์ไร้ความหมายกับตัวเอง แล้ววัดความจำจาก "เวลาที่ประหยัดได้เมื่อเรียนซ้ำ" พบว่าลืมเร็วมากในช่วงแรกแล้วค่อยๆ ช้าลง สมการที่เขาเสนอเองเป็นแบบลอการิทึม (b = 100k / ((log t)^c + k)) ไม่ใช่แบบ e^(-t/S)</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <h4 class="font-bold text-blue-800 text-sm">ทดลองซ้ำ (Murre & Dros, 2015, PLOS ONE)</h4>
+                                    <p class="text-slate-600 leading-relaxed">ทำการทดลองของ Ebbinghaus ซ้ำกับผู้ทดลอง 1 คน ใช้เวลาเรียนราว 70 ชั่วโมง ทดสอบหลัง 20 นาที ถึง 31 วัน ได้ผลคล้ายของเดิม และพบว่าเส้นโค้งไม่เรียบสนิท มีแนวโน้มกระโดดขึ้นหลังจุด 24 ชั่วโมง งานนี้เปรียบเทียบสมการที่เข้ากับข้อมูล ไม่ได้ยืนยันว่า R = e^(-t / S) เป็นสูตรที่ดีที่สุด</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <h4 class="font-bold text-slate-800 text-sm">ทำไมแอปนี้ใช้ e^(-t / S)</h4>
+                                    <p class="text-slate-600 leading-relaxed">เพราะคำนวณง่ายและตั้งค่าได้ด้วยตัวแปรเดียว (S) แต่เป็นเพียงการประมาณ งานด้านความจำจำนวนมากพบว่าเส้นโค้งจริงมักลดช้าลงกว่าแบบ exponential ระบบรุ่นใหม่อย่าง FSRS (ตั้งแต่รุ่น 4.5) จึงใช้เส้นโค้งแบบ power แทน ถ้าใช้จริงจัง ให้ถือเป็นค่าประมาณคร่าวๆ</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <h4 class="font-bold text-teal-800 text-sm">การเว้นระยะทบทวน (Cepeda และคณะ, 2006 และ 2008)</h4>
+                                    <p class="text-slate-600 leading-relaxed">งานรวมผลวิจัย (2006) วิเคราะห์ 317 การทดลองจาก 184 บทความ พบว่าเรียนแบบเว้นระยะจำได้ดีกว่าเรียนอัดรวดเดียว และระยะเว้นที่ดีที่สุดยิ่งยาวขึ้นเมื่ออยากจำนานขึ้น งานปี 2008 พบว่าระยะเว้นที่ดีคือราว 20-40% ของเวลาที่อยากจำ (กรณีสอบใน 1 สัปดาห์) และลดเหลือ 5-10% (กรณีสอบใน 1 ปี) ส่วนการเพิ่มระยะห่างขึ้นเรื่อยๆ งานวิจัยยังสรุปไม่ชัดว่าดีกว่าเว้นระยะเท่าๆ กันมากนัก</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <h4 class="font-bold text-purple-800 text-sm">นึกเองดีกว่าอ่านซ้ำ (Roediger & Karpicke, 2006)</h4>
+                                    <p class="text-slate-600 leading-relaxed">การทดสอบตัวเองช่วยให้จำระยะยาวได้ดีกว่าการอ่านซ้ำ (อ่านซ้ำอาจดูดีกว่าในระยะสั้น แต่หลังผ่านไปประมาณ 1 สัปดาห์ การทดสอบตัวเองชนะ) ส่วนแนวคิด "ความยากที่พอดี" (Desirable Difficulty) มาจาก Robert Bjork ว่าการต้องใช้ความพยายามนึกช่วยให้จำได้นานขึ้น</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <h4 class="font-bold text-amber-800 text-sm">ระบบทบทวนแบบเว้นระยะ (SM-2 และ FSRS)</h4>
+                                    <p class="text-slate-600 leading-relaxed">SM-2 ของ Piotr Woźniak (SuperMemo, ทศวรรษ 1980) และต่อมาคือ Anki ใช้การให้คะแนนหลังทบทวนเพื่อกำหนดรอบถัดไป ส่วน FSRS (Ye และคณะ) ใช้ 3 ตัวแปร คือ ความเสถียร (Stability), ความยาก (Difficulty) และโอกาสจำได้ (Retrievability) และให้ผู้ใช้ตั้ง "ความจำเป้าหมาย" เอง (ค่าเริ่มต้นของ FSRS ใน Anki คือ 90%) ค่าสูง = ทบทวนถี่แต่ลืมน้อย ค่าต่ำ = ทบทวนน้อยแต่ลืมมากขึ้น จึงไม่มี "จุดทอง" ที่พิสูจน์ตายตัว ปุ่ม 4 ระดับของแอปนี้ (ซ้ำอีกครั้ง/ยาก/ปานกลาง/ง่าย) ได้แนวคิดจากระบบเหล่านี้ และใช้ตัวคูณตามค่าเริ่มต้นของ Anki</p>
+                                </div>
+                                </div>
+
+                            <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed space-y-3">
+                                <p class="font-bold text-sm">ที่มาของตัวเลขสำคัญในแอปนี้ (อะไรคำนวณได้ อะไรตั้งเอง)</p>
+
+                                <div class="bg-white/70 p-3 rounded-lg border border-amber-200 space-y-1">
+                                    <p class="font-bold">1. S คือเวลาที่ความจำเหลือ 36.8% (คำนวณได้ ไม่ใช่ผลวิจัย)</p>
+                                    <p>เป็นผลทางคณิตศาสตร์ของสูตร R = e^(-t / S) เมื่อ t = S จะได้ R = e^(-1) = 0.368<br>
+                                    FSRS นิยาม S ต่างออกไป (S = เวลาที่ความจำเหลือ 90%) ถ้าสมมติว่าเส้นโค้งเป็นแบบ exponential จะแปลงได้ว่า <span class="font-mono font-bold">S ของแอป ≈ 9.49 × S ของ FSRS</span> (เพราะ 1 / -ln(0.9) = 9.49) เป็นเพียงค่าประมาณ เพราะ FSRS รุ่นใหม่ใช้เส้นโค้งแบบ power</p>
+                                </div>
+
+                                <div class="bg-white/70 p-3 rounded-lg border border-amber-200 space-y-1">
+                                    <p class="font-bold">2. จุดทบทวนที่ R = 85% (เลือกจากช่วงที่ระบบจริงใช้ ไม่ใช่ค่าที่พิสูจน์ว่าดีที่สุด)</p>
+                                    <p>FSRS/Anki ให้ผู้ใช้ตั้งความจำเป้าหมายได้ราว 70-97% (ค่าเริ่มต้น 90%) แอปนี้เลือก 85% ซึ่งอยู่ในช่วง 75-90% ที่นิยมใช้ ยังไม่มีงานวิจัยที่ระบุว่า 85% ดีที่สุด<br>
+                                    เวลาทบทวนคำนวณได้จาก -S × ln(0.85) = <span class="font-mono font-bold">0.1625 × S</span> (ถ้าใช้ 90% จะเป็น 0.1054 × S)</p>
+                                </div>
+
+                                <div class="bg-white/70 p-3 rounded-lg border border-amber-200 space-y-1">
+                                    <p class="font-bold">3. ตัวคูณ S (ใช้ตามค่าเริ่มต้นของ Anki ซึ่งเป็นค่าของซอฟต์แวร์ ไม่ใช่ผลการทดลอง)</p>
+                                    <p>เพราะเวลาทบทวนเป็นสัดส่วนกับ S ตัวคูณจึงเท่ากับ "รอบทบทวนถัดไปห่างขึ้นกี่เท่า" Anki (แนวคิดแบบ SM-2) ตั้งค่าเริ่มต้นไว้ที่ ยาก × 1.2, ปานกลาง × 2.5, ง่าย × 2.5 × 1.3 = × 3.25 แอปนี้ใช้ค่าเดียวกัน<br>
+                                    ปุ่ม "ซ้ำอีกครั้ง" รีเซ็ต S เหลือ 1 ชม. (ทบทวนซ้ำที่ราว 10 นาที ตรงกับขั้นเรียนซ้ำเริ่มต้นของ Anki) ซึ่งเป็นการตั้งค่าให้สอดคล้องกัน ไม่ใช่ผลวิจัย<br>
+                                    <span class="text-amber-800">ข้อจำกัด: Anki ยังปรับ "ease" ตามปุ่มที่กดด้วย (ลด 20% / ลด 15% / เพิ่ม 15%) แต่แอปนี้ใช้ ease คงที่ 2.5 เพื่อความง่าย และ FSRS ไม่ใช้ตัวคูณคงที่แต่คำนวณจากความจำที่เหลือตอนทบทวน ความยาก และ S</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+                            <span>ออกแบบและพัฒนาโดย <strong>Sarayut Angkoh (SproutS Project)</strong></span>
+                            <span>คำนวณใหม่อัตโนมัติทุก 30 วินาที</span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL 1: ADD SUBJECT MODAL -->
+    <div id="addSubjectModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="modal-box bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-base">เพิ่มรายวิชาใหม่เข้าสู่ระบบ</h3>
+                <button onclick="closeModal('addSubjectModal')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="addSubjectForm" onsubmit="handleAddSubject(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">ชื่อรายวิชา / หัวข้อ</label>
+                    <input type="text" id="subjectNameInput" required placeholder="เช่น ฟิสิกส์ - บทที่ 3 คลื่นกล" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-600">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">หมวดหมู่ / รหัสวิชา</label>
+                    <input type="text" id="subjectCategoryInput" placeholder="เช่น วิทยาศาสตร์ / PHY101" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-600">
+                </div>
+
+                <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-900 leading-relaxed">
+                    <strong>ไม่ต้องตั้งค่า S เอง</strong> ระบบกำหนดความแข็งแรงความจำเริ่มต้นให้อัตโนมัติ (<span id="initialSLabel">24 ชม.</span>) แล้วจะปรับให้เองทุกครั้งที่คุณกดบันทึกการทบทวน
+                </div>
+
+                <div class="pt-3 flex items-center justify-end space-x-2">
+                    <button type="button" onclick="closeModal('addSubjectModal')" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg font-medium hover:bg-slate-50">ยกเลิก</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-700 text-white rounded-lg font-medium hover:bg-emerald-800">บันทึกรายวิชา</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: AUTH / LOGIN MODAL -->
+    <div id="authModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="modal-box bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-6 space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h3 id="authModalTitle" class="font-bold text-slate-800 text-base">เข้าสู่ระบบใช้งาน</h3>
+                <button onclick="closeModal('authModal')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">อีเมลผู้ใช้งาน</label>
+                    <input type="email" id="authEmail" required placeholder="student@example.com" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-600">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">รหัสผ่าน</label>
+                    <input type="password" id="authPassword" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-600">
+                </div>
+
+                <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2">หมายเหตุ: ส่วนนี้เป็นเดโม ยังไม่มีเซิร์ฟเวอร์จริง ไม่มีการบันทึกอีเมลหรือรหัสผ่าน ข้อมูลวิชาเก็บไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น</p>
+                <div class="pt-2">
+                    <button type="submit" id="authSubmitBtn" class="w-full py-2.5 bg-emerald-700 text-white rounded-lg font-medium hover:bg-emerald-800 transition-colors">เข้าสู่ระบบ</button>
+                </div>
+            </form>
+
+            <div class="text-center pt-2 text-xs text-slate-500 border-t border-slate-100">
+                <span id="authToggleText">ยังไม่มีบัญชี?</span>
+                <button type="button" onclick="toggleAuthMode()" id="authToggleBtn" class="text-emerald-700 font-semibold ml-1 hover:underline">สมัครสมาชิกที่นี่</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GOAL -->
+    <div id="goalModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="modal-box bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-base">ตั้งเป้าหมายความจำ</h3>
+                <button onclick="closeModal('goalModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="goalForm" onsubmit="handleGoalSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">วิชา</label>
+                    <select id="goalSubject" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5"></select>
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">ชื่อเป้าหมาย</label>
+                    <input type="text" id="goalName" placeholder="เช่น สอบปลายภาค, สอบ TOEFL" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">อยากให้ยังจำได้ ณ เมื่อไหร่</label>
+                    <select id="goalMode" onchange="toggleGoalMode()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                        <option value="date">ระบุวันที่ (เช่น วันสอบ)</option>
+                        <option value="duration">ระบุระยะเวลาจากวันนี้</option>
+                    </select>
+                </div>
+                <div id="goalDateWrap"><input type="date" id="goalDate" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5"></div>
+                <div id="goalDurWrap" class="hidden">
+                    <div class="flex gap-2">
+                        <input type="number" id="goalDurN" min="1" value="3" class="w-24 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                        <select id="goalDurUnit" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                            <option value="1">วัน</option><option value="7">สัปดาห์</option><option value="30" selected>เดือน (นับ 30 วัน)</option><option value="365">ปี (นับ 365 วัน)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-3 flex items-center justify-between">
+                    <button type="button" id="goalDeleteBtn" onclick="deleteGoal()" class="px-3 py-2 text-rose-600 hover:bg-rose-50 rounded-lg font-medium hidden">ลบเป้าหมาย</button>
+                    <div class="flex items-center space-x-2 ml-auto">
+                        <button type="button" onclick="closeModal('goalModal')" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg font-medium hover:bg-slate-50">ยกเลิก</button>
+                        <button type="submit" class="px-4 py-2 bg-emerald-700 text-white rounded-lg font-medium hover:bg-emerald-800">บันทึกเป้าหมาย</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: METHOD (ถามวิธีทบทวนก่อนบันทึก) -->
+    <div id="methodModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="modal-box bg-white rounded-t-2xl sm:rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-5 sm:p-6 space-y-4">
+            <div class="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
+                <div class="min-w-0">
+                    <h3 class="font-bold text-slate-800 text-base">ก่อนบันทึก: คุณทบทวนด้วยวิธีไหน?</h3>
+                    <p id="methodModalSub" class="text-xs text-slate-500 mt-0.5 break-words"></p>
+                </div>
+                <button onclick="closeModal('methodModal')" aria-label="ปิด" class="text-slate-400 hover:text-slate-600 flex-shrink-0 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="methodModalBody" class="space-y-4 text-xs"></div>
+            <div class="pt-2 flex items-center justify-end gap-2 text-xs">
+                <button type="button" onclick="closeModal('methodModal')" class="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-lg font-medium hover:bg-slate-50">ยกเลิก</button>
+                <button type="button" id="methodConfirmBtn" onclick="submitMethodModal()" disabled class="px-4 py-2.5 bg-emerald-700 text-white rounded-lg font-bold hover:bg-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed">บันทึกการทบทวน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: OFFLINE REPORT (สรุปการลืมช่วงที่ปิดเว็บ) -->
+    <div id="offlineModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="modal-box bg-white rounded-t-2xl sm:rounded-2xl border border-slate-200 shadow-xl w-full max-w-lg p-5 sm:p-6 space-y-4">
+            <div class="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2"><i data-lucide="hourglass" class="w-5 h-5 text-amber-600"></i><span>ยินดีต้อนรับกลับ</span></h3>
+                <button onclick="closeModal('offlineModal')" aria-label="ปิด" class="text-slate-400 hover:text-slate-600 flex-shrink-0 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <p id="offlineSummary" class="text-xs text-slate-600 leading-relaxed"></p>
+            <div id="offlineList" class="space-y-2"></div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">ความจำลดลงตามเวลาจริงแม้ปิดเว็บไว้ ระบบคำนวณจากเวลาที่คุณทบทวนล่าสุด จึงไม่ต้องเปิดแอปค้างไว้</p>
+            <div class="pt-1 flex items-center justify-end gap-2 text-xs">
+                <button type="button" onclick="closeModal('offlineModal')" class="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-lg font-medium hover:bg-slate-50">ปิด</button>
+                <button type="button" onclick="closeModal('offlineModal'); navigateToQuickLog()" class="px-4 py-2.5 bg-amber-500 text-white rounded-lg font-bold hover:bg-amber-600 flex items-center gap-1.5"><i data-lucide="zap" class="w-4 h-4"></i>ทบทวนเลยตอนนี้</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="fixed bottom-4 left-3 right-3 sm:left-auto sm:bottom-5 sm:right-5 z-[60] space-y-2 pointer-events-none"></div>
+
+
+    <!-- JavaScript (ลำดับการโหลดสำคัญ: data -> utils -> chart -> app) -->
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

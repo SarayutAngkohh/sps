@@ -1,0 +1,104 @@
+/* ============================================================
+ * styles.css
+ * Custom CSS Animation & Keyframes (scrollbar, pulse-green, glow-jump-btn) + ส่วนรองรับมือถือ
+ * ============================================================ */
+
+body {
+    font-family: 'Kanit', 'Inter', sans-serif;
+    background-color: #f7faf7;
+    color: #1e293b;
+}
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+.pulse-green {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Prominent Jump Button Glow Animation */
+.glow-jump-btn {
+    animation: glow-amber 1.8s infinite ease-in-out;
+}
+@keyframes glow-amber {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(245, 158, 11, 0.5), 0 0 15px rgba(245, 158, 11, 0.3);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 18px rgba(245, 158, 11, 0.9), 0 0 28px rgba(245, 158, 11, 0.5);
+        transform: scale(1.03);
+    }
+}
+
+/* ============================================================
+ * รองรับมือถือ (Mobile support)
+ * ============================================================ */
+
+/* ความสูงเต็มจอที่ไม่โดนแถบเบราว์เซอร์มือถือบัง (dvh) พร้อม fallback */
+.app-h {
+    height: 100vh;
+    height: 100dvh;
+}
+
+/* กล่อง Modal: สูงไม่เกิน 90% ของจอ และเลื่อนดูข้างในได้ */
+.modal-box {
+    max-height: 90vh;
+    max-height: 90dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button, a, select, summary {
+    touch-action: manipulation;
+}
+
+body {
+    overscroll-behavior-y: none;
+}
+
+@media (max-width: 767px) {
+    /* กัน iOS ซูมหน้าเองตอนแตะช่องกรอก (ต้องฟอนต์ >= 16px) */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+
+    /* เมนูลิ้นชักกันชนรอยบากของจอ */
+    #sidebar {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        box-shadow: 0 0 40px rgba(15, 23, 42, 0.25);
+    }
+}
+
+/* ลดการเคลื่อนไหวสำหรับผู้ที่ตั้งค่าไว้ในระบบ */
+@media (prefers-reduced-motion: reduce) {
+    .pulse-green, .glow-jump-btn, .animate-bounce {
+        animation: none !important;
+    }
+}
